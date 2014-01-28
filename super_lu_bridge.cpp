@@ -49,7 +49,7 @@ static void Algebra(Registry& reg, string grp)
 //	typedefs for this algebra
 	typedef typename TAlgebra::vector_type vector_type;
 	typedef typename TAlgebra::matrix_type matrix_type;
-	UG_LOG("Init SuperLU!\n");
+
 	// 	SuperLU Solver
 	{
 		typedef SuperLUSolver<TAlgebra> T;

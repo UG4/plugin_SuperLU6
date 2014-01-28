@@ -24,13 +24,17 @@ endif(SUPERLU_PATH)
 
 
 include_directories("${INTERNAL_SUPERLU_PATH}/SRC/")
-set(linkLibraries ${linkLibraries} "${INTERNAL_SUPERLU_PATH}/lib/libsuperlu_4.3.a")
 
 
+add_library(SuperLULib STATIC IMPORTED)
+set_property(TARGET SuperLULib PROPERTY IMPORTED_LOCATION "${INTERNAL_SUPERLU_PATH}/lib/libsuperlu_4.3.a")
+ 
 if(buildEmbeddedPlugins)
 	# add the sources to ug4's sources
 	EXPORTSOURCES(plugins/experimental/superlu ${srcSuperLU})
+	target_link_libraries(ug4 SuperLULib)
 else(buildEmbeddedPlugins)
-	add_library(superLU SHARED ${srcSuperLU})
-	target_link_libraries (superLU ug4)
+	add_library(superLU SHARED ${srcSuperLU})	
+	target_link_libraries (superLU ug4 )
+	target_link_libraries(superLU SuperLULib)
 endif(buildEmbeddedPlugins)
