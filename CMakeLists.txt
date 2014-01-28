@@ -1,5 +1,18 @@
 ################################################################################
-# SuperLU
+#      SuperLU plugin
+#----------------------------
+# information about SuperLU is here http://crd-legacy.lbl.gov/~xiaoye/SuperLU
+# if you are using SuperLU, remember to CITE it!
+# bibtex information is here
+#     http://crd-legacy.lbl.gov/~xiaoye/SuperLU/referencing.html
+#
+# ug4 plugin by Martin Rupp
+# how to use:
+#     cmake -DSuperLU=ON ..
+# this will install SuperLU with uginstall to ~/local/SuperLU
+# this is tested for Macs and Cekon
+# if this does not work, you can supply your own SuperLU path with
+#     cmake -DSuperLU=ON -DSUPERLU_PATH=/path/to/my/superlu .. 
 ################################################################################
 
 cmake_minimum_required(VERSION 2.6)
