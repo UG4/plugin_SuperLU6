@@ -13,11 +13,13 @@ include("../../../cmake/ug_plugin_includes.cmake")
 # sources
 set(srcSuperLU 	super_lu_bridge.cpp super_lu.cpp super_lu.h)
 
-# if super lu is ON
-if(SUPERLU_PATH)   
+
+if(SUPERLU_PATH)
+    # the user can suply a SUPER_LU path for his own compiled SuperLU   
     set(INTERNAL_SUPERLU_PATH "${SUPERLU_PATH}")
     message(STATUS "Info: SuperLU is ON, using user provided path ${INTERNAL_SUPERLU_PATH}")
 else(SUPERLU_PATH)
+    # in other cases we use uginstall to download & install superlu (works on machines like Mac and Cekon)
     if(NOT EXISTS "$ENV{HOME}/local/SuperLU/used/installed")
         execute_process(COMMAND bash ${UG_ROOT_PATH}/scripts/shell/uginstall SuperLU)
         if(NOT EXISTS "$ENV{HOME}/local/SuperLU/used/installed")
