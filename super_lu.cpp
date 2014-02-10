@@ -73,37 +73,14 @@ public:
 		PROFILE_BEGIN_GROUP(SuperLU_Preprocess, "algebra SuperLU");
 		typedef CPUAlgebra::matrix_type::const_row_iterator row_it;
 		typedef CPUAlgebra::matrix_type::value_type value_type;
-		size_t nnz =0;
-		size_t N = A.num_rows();
 
-
-		for(size_t r=0; r<N; r++)
-		{
-			for(row_it it = A.begin_row(r); it != A.end_row(r); ++it)
-				nnz++;
-		}
+		size_t numRows, numCols;
+		A.copy_crs(numRows, numCols, nzval, rowptr, colind);
+		THROW_IF_NOT_EQUAL(numRows, numCols);
+		size_t N = numRows;
+		size_t nnz = nzval.size();
 		if(N > 40000 && nnz > 400000) { UG_LOG("SuperLU preprocess, N = " << N << ", nnz = " << nnz << "... "); }
 
-		nzval.resize(nnz);
-		colind.resize(nnz);
-		rowptr.resize(N+1);
-
-		size_t colIndPos=0;
-		for(size_t r=0; r<N; r++)
-		{
-			rowptr[r] = colIndPos;
-			for(row_it it = A.begin_row(r); it != A.end_row(r); ++it)
-			{
-				nzval[colIndPos] = it.value();
-				colind[colIndPos] = it.index();
-				colIndPos++;
-			}
-			rowptr[r+1] = colIndPos;
-		}
-
-//			PrintVector(nzval, nnz, "nzval");
-//			PrintVector(colind, nnz, "colind");
-//			PrintVector(rowptr, N+1, "rowptr");
 
 		superlu_options_t options;
 		SuperLUStat_t stat;
