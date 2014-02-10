@@ -37,6 +37,9 @@ public:
 	{
 		destroy();
 	}
+
+
+
 	void destroy()
 	{
 		if(m_bInited)
@@ -49,7 +52,16 @@ public:
 			memset(&SuperLU_L, 0, sizeof(SuperMatrix));
 			Destroy_CompCol_Matrix(&SuperLU_U);
 			memset(&SuperLU_U, 0, sizeof(SuperMatrix));
+
+		    SUPERLU_FREE (etree);
+		    Destroy_CompCol_Permuted(&AC);
+		    if ( SuperLU_A.Stype == SLU_NR ) {
+			Destroy_SuperMatrix_Store(AA);
+			SUPERLU_FREE(AA);
+		    }
+
 			m_bInited = false;
+
 		}
 	}
 
@@ -66,10 +78,81 @@ public:
 		}
 	}
 
+	superlu_options_t options;
+
+
+
+	int *etree;
+	SuperMatrix *AA;/* A in SLU_NC format used by the factorization routine.*/
+	SuperMatrix AC; /* Matrix postmultiplied by Pc */
+	trans_t  trans = NOTRANS;
+
+	void
+	dgssvA(superlu_options_t *options, SuperMatrix *A, int *perm_c, int *perm_r,
+	      SuperMatrix *L, SuperMatrix *U, SuperMatrix *B,
+	      SuperLUStat_t *stat, int *info )
+	{
+
+	    DNformat *Bstore;
+
+	    int      lwork = 0, i;
+
+	    /* Set default values for some parameters */
+	    int      panel_size;     /* panel size */
+	    int      relax;          /* no of columns in a relaxed snodes */
+	    int      permc_spec;
+	     trans = NOTRANS;
+
+
+	    /* Convert A to SLU_NC format when necessary. */
+	    if ( A->Stype == SLU_NR ) {
+		NRformat *Astore = (NRformat*)A->Store;
+		AA = (SuperMatrix *) SUPERLU_MALLOC( sizeof(SuperMatrix) );
+		dCreate_CompCol_Matrix(AA, A->ncol, A->nrow, Astore->nnz,
+				(double*)Astore->nzval, Astore->colind, Astore->rowptr,
+				       SLU_NC, A->Dtype, A->Mtype);
+		trans = TRANS;
+	    } else {
+	        if ( A->Stype == SLU_NC ) AA = A;
+	    }
+
+	    /*
+	     * Get column permutation vector perm_c[], according to permc_spec:
+	     *   permc_spec = NATURAL:  natural ordering
+	     *   permc_spec = MMD_AT_PLUS_A: minimum degree on structure of A'+A
+	     *   permc_spec = MMD_ATA:  minimum degree on structure of A'*A
+	     *   permc_spec = COLAMD:   approximate minimum degree column ordering
+	     *   permc_spec = MY_PERMC: the ordering already supplied in perm_c[]
+	     */
+	    permc_spec = options->ColPerm;
+	    if ( permc_spec != MY_PERMC && options->Fact == DOFACT )
+	      get_perm_c(permc_spec, AA, perm_c);
+
+	    etree = intMalloc(A->ncol);
+
+	    sp_preorder(options, AA, perm_c, etree, &AC);
+
+	    panel_size = sp_ienv(1);
+	    relax = sp_ienv(2);
+
+	    /* Compute the LU factorization of A. */
+	    dgstrf(options, &AC, relax, panel_size, etree,
+	            NULL, lwork, perm_c, perm_r, L, U, stat, info);
+	}
+	void
+	dgssvB(superlu_options_t *options, SuperMatrix *A, int *perm_c, int *perm_r,
+	      SuperMatrix *L, SuperMatrix *U, SuperMatrix *B,
+	      SuperLUStat_t *stat, int *info )
+	{
+	    dgstrs (trans, L, U, perm_c, perm_r, B, stat, info);
+	}
+
+
+
 	virtual bool init(const CPUAlgebra::matrix_type &A)
 	{
 
-//		destroy();
+		destroy();
 		PROFILE_BEGIN_GROUP(SuperLU_Preprocess, "algebra SuperLU");
 		typedef CPUAlgebra::matrix_type::const_row_iterator row_it;
 		typedef CPUAlgebra::matrix_type::value_type value_type;
@@ -82,7 +165,7 @@ public:
 		if(N > 40000 && nnz > 400000) { UG_LOG("SuperLU preprocess, N = " << N << ", nnz = " << nnz << "... "); }
 
 
-		superlu_options_t options;
+
 		SuperLUStat_t stat;
 
 		dCreate_CompRow_Matrix(&SuperLU_A, N, N, nnz, &nzval[0], &colind[0], &rowptr[0], SLU_NR, SLU_D, SLU_GE);
@@ -103,15 +186,12 @@ public:
 		StatInit(&stat);
 		int info;
 
+		dgssvA(&options, &SuperLU_A, &perm_c[0], &perm_r[0], &SuperLU_L, &SuperLU_U, &SuperLU_B, &stat, &info);
 
-//			A.print("A");
-
-		dgssv(&options, &SuperLU_A, &perm_c[0], &perm_r[0], &SuperLU_L, &SuperLU_U, &SuperLU_B, &stat, &info);
-
-		dgssv_check_info(info, N);
+		/*dgssv_check_info(info, N);
 		if(config.bPrintStat)
 			StatPrint(&stat);
-		StatFree(&stat);
+		StatFree(&stat);*/
 		if(N > 40000 && nnz > 400000) { UG_LOG("done.\n"); }
 		m_bInited = true;
 		return true;
@@ -147,11 +227,11 @@ public:
 
 		superlu_options_t options;
 		set_default_options(&options);
-		//options.Fact = FACTORED;
+		options.Fact = FACTORED;
 		int info;
 		SuperLUStat_t stat;
 		StatInit(&stat);
-		dgssv(&options, &SuperLU_A, &perm_c[0], &perm_r[0], &SuperLU_L, &SuperLU_U, &SuperLU_B, &stat, &info);
+		dgssvB(&options, &SuperLU_A, &perm_c[0], &perm_r[0], &SuperLU_L, &SuperLU_U, &SuperLU_B, &stat, &info);
 		StatFree(&stat);
 		dgssv_check_info(info, N);
 
