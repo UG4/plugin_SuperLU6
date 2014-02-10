@@ -66,7 +66,7 @@ public:
 		}
 	}
 
-	virtual void init(const CPUAlgebra::matrix_type &A)
+	virtual bool init(const CPUAlgebra::matrix_type &A)
 	{
 
 //		destroy();
@@ -114,7 +114,7 @@ public:
 		StatFree(&stat);
 		if(N > 40000 && nnz > 400000) { UG_LOG("done.\n"); }
 		m_bInited = true;
-
+		return true;
 	}
 
 	void dgssv_check_info(int info, size_t N)
@@ -136,7 +136,7 @@ public:
 		}
 	}
 
-	virtual void apply(CPUAlgebra::vector_type &c, const CPUAlgebra::vector_type &d)
+	virtual bool apply(CPUAlgebra::vector_type &c, const CPUAlgebra::vector_type &d)
 	{
 		PROFILE_BEGIN_GROUP(SuperLU_Apply, "algebra SuperLU");
 		size_t N = c.size();
@@ -157,6 +157,8 @@ public:
 
 		for (size_t i = 0; i < N; ++i)
 			c[i] = b[i];
+
+		return true;
 	}
 
 	virtual const char* name() const { return "SuperLU"; }

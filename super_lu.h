@@ -7,8 +7,8 @@
  * \author Martin Rupp
  */
 
-#ifndef __H__UG__LIB_DISC__OPERATOR__LINEAR_OPERATOR__SUPER_LU_SOLVER_
-#define __H__UG__LIB_DISC__OPERATOR__LINEAR_OPERATOR__SUPER_LU_SOLVER_
+#ifndef __H__UG__SUPER_LU_SOLVER__
+#define __H__UG__SUPER_LU_SOLVER__
 
 #include "lib_algebra/operator/linear_solver/external_solvers/external_solvers.h"
 #include <vector>
@@ -34,7 +34,7 @@ template<typename TAlgebra>
 class SuperLUSolver : public IExternalSolver<TAlgebra>
 {
 	SuperLUConfiguration config;
-	using IExternalSolver<TAlgebra>::impl;
+	IExternalSolverImplementation *impl;
 public:
 	SuperLUSolver()
 	{
@@ -74,6 +74,23 @@ public:
 	{
 		config.colPerm = SuperLUConfiguration::CPT_COLAMD;
 	}
+
+
+	virtual bool double_apply(CPUAlgebra::vector_type &c, const CPUAlgebra::vector_type &d)
+	{
+		return impl->apply(c, d);
+	}
+
+	virtual const char *double_name() const
+	{
+		return impl->name();
+	}
+
+	virtual void double_init(const CPUAlgebra::matrix_type &mat)
+	{
+		impl->init(mat);
+	}
+
 };
 
 } // end namespace ug
