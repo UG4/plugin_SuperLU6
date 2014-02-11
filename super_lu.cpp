@@ -152,6 +152,8 @@ public:
 		typedef CPUAlgebra::matrix_type::const_row_iterator row_it;
 		typedef CPUAlgebra::matrix_type::value_type value_type;
 
+		if( A.num_rows() == 0 || A.num_cols() == 0) return true;
+
 		size_t numRows, numCols;
 		A.copy_crs(numRows, numCols, nzval, rowptr, colind);
 		THROW_IF_NOT_EQUAL(numRows, numCols);
@@ -215,6 +217,7 @@ public:
 	{
 		PROFILE_BEGIN_GROUP(SuperLU_Apply, "algebra SuperLU");
 		size_t N = c.size();
+		if(N == 0) return true;
 		double *b = (double*) ((DNformat*) SuperLU_B.Store)->nzval;
 
 		for (size_t i = 0; i < N; ++i)
