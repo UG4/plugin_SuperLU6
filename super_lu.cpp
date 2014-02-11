@@ -28,7 +28,7 @@ class SuperLUImplementation : public IExternalSolverImplementation
 	SuperLUConfiguration &config;
 
 public:
-	SuperLUImplementation(SuperLUConfiguration &_config) : config(_config)
+	SuperLUImplementation(SuperLUConfiguration &_config) : config(_config), trans(NOTRANS)
 	{
 		m_bInited=false;
 	}
@@ -80,7 +80,7 @@ public:
 	int *etree;
 	SuperMatrix *AA;/* A in SLU_NC format used by the factorization routine.*/
 	SuperMatrix AC; /* Matrix postmultiplied by Pc */
-	trans_t  trans = NOTRANS;
+	trans_t  trans;
 
 	void
 	dgssvA(superlu_options_t *options, SuperMatrix *A, int *perm_c, int *perm_r,
@@ -88,9 +88,9 @@ public:
 	      SuperLUStat_t *stat, int *info )
 	{
 
-	    DNformat *Bstore;
+	    //DNformat *Bstore;
 
-	    int      lwork = 0, i;
+	    int      lwork = 0;
 
 	    /* Set default values for some parameters */
 	    int      panel_size;     /* panel size */
