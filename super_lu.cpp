@@ -44,8 +44,7 @@ public:
 	{
 		if(m_bInited)
 		{
-			Destroy_CompCol_Matrix(&SuperLU_A);
-			memset(&SuperLU_A, 0, sizeof(SuperMatrix));
+			// DO NOT destroy SuperLU_A and AA since we supplied all pointers!!!
 			Destroy_SuperMatrix_Store(&SuperLU_B);
 			memset(&SuperLU_B, 0, sizeof(SuperMatrix));
 			Destroy_SuperNode_Matrix(&SuperLU_L);
@@ -55,10 +54,6 @@ public:
 
 		    SUPERLU_FREE (etree);
 		    Destroy_CompCol_Permuted(&AC);
-		    if ( SuperLU_A.Stype == SLU_NR ) {
-			Destroy_SuperMatrix_Store(AA);
-			SUPERLU_FREE(AA);
-		    }
 
 			m_bInited = false;
 
@@ -104,7 +99,7 @@ public:
 	     trans = NOTRANS;
 
 
-	    /* Convert A to SLU_NC format when necessary. */
+	     /* Convert A to SLU_NC format when necessary. */
 	    if ( A->Stype == SLU_NR ) {
 		NRformat *Astore = (NRformat*)A->Store;
 		AA = (SuperMatrix *) SUPERLU_MALLOC( sizeof(SuperMatrix) );
