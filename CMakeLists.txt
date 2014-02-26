@@ -26,7 +26,7 @@ include("../../../cmake/ug_plugin_includes.cmake")
 # sources
 set(srcSuperLU 	super_lu_bridge.cpp super_lu.cpp super_lu.h)
 
-
+# detect path for SuperLU-Library
 if(SUPERLU_PATH)
     # the user can suply a SUPER_LU path for his own compiled SuperLU   
     set(INTERNAL_SUPERLU_PATH "${SUPERLU_PATH}")
@@ -46,19 +46,17 @@ else(SUPERLU_PATH)
     
 endif(SUPERLU_PATH)
 
-
-include_directories("${INTERNAL_SUPERLU_PATH}/SRC/")
-
-
-add_library(SuperLULib STATIC IMPORTED)
-set_property(TARGET SuperLULib PROPERTY IMPORTED_LOCATION "${INTERNAL_SUPERLU_PATH}/lib/libsuperlu_4.3.a")
- 
+# Add to build process 
 if(buildEmbeddedPlugins)
-	# add the sources to ug4's sources
-	EXPORTSOURCES(plugins/experimental/superlu ${srcSuperLU})
-	target_link_libraries(ug4 SuperLULib)
+	ExportSources(plugins/experimental/superlu ${srcSuperLU})
+    ExportDependencies("${INTERNAL_SUPERLU_PATH}/lib/libsuperlu_4.3.a")
+    if(EXISTS "${INTERNAL_SUPERLU_PATH}/lib/blas.a")
+        ExportDependencies("${INTERNAL_SUPERLU_PATH}/lib/blas.a")
+    endif(EXISTS "${INTERNAL_SUPERLU_PATH}/lib/blas.a")
+    ExportIncludes("${INTERNAL_SUPERLU_PATH}/SRC/")
 else(buildEmbeddedPlugins)
+    include_directories("${INTERNAL_SUPERLU_PATH}/SRC/")
 	add_library(superLU SHARED ${srcSuperLU})	
-	target_link_libraries (superLU ug4 )
-	target_link_libraries(superLU SuperLULib)
+	target_link_libraries(superLU ug4)
+	target_link_libraries(superLU "${INTERNAL_SUPERLU_PATH}/lib/libsuperlu_4.3.a")
 endif(buildEmbeddedPlugins)

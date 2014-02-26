@@ -90,7 +90,7 @@ void RegisterBridge_SuperLU(Registry& reg, string grp)
 
 
 extern "C" void
-InitUGPlugin_superLU(Registry* reg, string grp)
+InitUGPlugin_SuperLU(Registry* reg, string grp)
 {
 	RegisterBridge_SuperLU(*reg, grp);
 }
