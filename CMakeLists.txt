@@ -32,16 +32,7 @@ if(SUPERLU_PATH)
     set(INTERNAL_SUPERLU_PATH "${SUPERLU_PATH}")
     message(STATUS "Info: SuperLU is ON, using user provided path ${INTERNAL_SUPERLU_PATH}")
 else(SUPERLU_PATH)
-    # in other cases we use uginstall to download & install superlu (works on machines like Mac and Cekon)
-    if(NOT EXISTS "$ENV{HOME}/local/SuperLU/used/installed")
-        execute_process(COMMAND bash ${UG_ROOT_PATH}/scripts/shell/uginstall SuperLU)
-        if(NOT EXISTS "$ENV{HOME}/local/SuperLU/used/installed")
-            message(ERROR "SuperLU could not be installed by uginstall.")
-        endif(NOT EXISTS "$ENV{HOME}/local/SuperLU/used/installed")        
-    endif(NOT EXISTS "$ENV{HOME}/local/SuperLU/used/installed")
-    
-    set(INTERNAL_SUPERLU_PATH "$ENV{HOME}/local/SuperLU/used/")
-    
+    UGInstall("SuperLU" INTERNAL_SUPERLU_PATH)
     message(STATUS "Info: SuperLU is ON, using uginstall provided path ${INTERNAL_SUPERLU_PATH}")    
     
 endif(SUPERLU_PATH)
