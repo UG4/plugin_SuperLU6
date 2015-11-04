@@ -1,10 +1,5 @@
 /*
- * \file super_lu.h
- *
  * http://crd-legacy.lbl.gov/~xiaoye/SuperLU
- *
- * \date 20.07.2013
- * \author Martin Rupp
  */
 
 #ifndef __H__UG__SUPER_LU_SOLVER__
