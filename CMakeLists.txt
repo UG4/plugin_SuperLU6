@@ -45,16 +45,16 @@
 #     cmake -DSuperLU=ON -DSUPERLU_PATH=/path/to/my/superlu .. 
 ################################################################################
 
+set(pluginName	SuperLU)
+set(SOURCES 	super_lu_bridge.cpp super_lu.cpp super_lu.h)
+
+
+
 cmake_minimum_required(VERSION 2.6)
-
-project(SuperLU)
-
+project(UG_PLUGIN_${pluginName})
 # include the definitions and dependencies for ug-plugins.
-include("../../../cmake/ug_plugin_includes.cmake")
+include(${UG_ROOT_CMAKE_PATH}/ug_plugin_includes.cmake)
 
-
-# sources
-set(srcSuperLU 	super_lu_bridge.cpp super_lu.cpp super_lu.h)
 
 # detect path for SuperLU-Library
 if(SUPERLU_PATH)
@@ -64,12 +64,11 @@ if(SUPERLU_PATH)
 else(SUPERLU_PATH)
     UGInstall("SuperLU" INTERNAL_SUPERLU_PATH)
     message(STATUS "Info: SuperLU is ON, using uginstall provided path ${INTERNAL_SUPERLU_PATH}")    
-    
 endif(SUPERLU_PATH)
 
 # Add to build process 
 if(buildEmbeddedPlugins)
-	ExportSources(plugins/experimental/superlu ${srcSuperLU})
+	ExportSources(${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES})
     ExportDependencies("${INTERNAL_SUPERLU_PATH}/lib/libsuperlu_4.3.a")
     if(EXISTS "${INTERNAL_SUPERLU_PATH}/lib/blas.a")
         ExportDependencies("${INTERNAL_SUPERLU_PATH}/lib/blas.a")
@@ -77,7 +76,7 @@ if(buildEmbeddedPlugins)
     ExportIncludes("${INTERNAL_SUPERLU_PATH}/SRC/")
 else(buildEmbeddedPlugins)
     include_directories("${INTERNAL_SUPERLU_PATH}/SRC/")
-	add_library(SuperLU SHARED ${srcSuperLU})	
+	add_library(SuperLU SHARED ${SOURCES})	
 	target_link_libraries(SuperLU ug4)
 	target_link_libraries(SuperLU "${INTERNAL_SUPERLU_PATH}/lib/libsuperlu_4.3.a")
 endif(buildEmbeddedPlugins)
