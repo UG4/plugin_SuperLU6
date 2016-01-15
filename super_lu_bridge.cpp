@@ -39,9 +39,11 @@
 #include "bridge/bridge.h"
 #include "bridge/util.h"
 #include "bridge/util_algebra_dependent.h"
+#include "bridge/util_domain_algebra_dependent.h"
 
 // preconditioner
 #include "lib_algebra/lib_algebra.h"
+#include "lib_algebra/operator/interface/constrained_linear_iterator.h"
 #include "super_lu.h"
 #include "bridge/util_overloaded.h"
 using namespace std;
@@ -94,6 +96,26 @@ static void Algebra(Registry& reg, string grp)
 }
 
 
+template <typename TDomain, typename TAlgebra>
+static void DomainAlgebra(Registry& reg, string grp)
+{
+	string suffix = GetDomainAlgebraSuffix<TDomain,TAlgebra>();
+	string tag = GetDomainAlgebraTag<TDomain,TAlgebra>();
+
+	// constrained SuperLU
+	{
+		typedef ConstrainedLinearIterator<TDomain, TAlgebra, SuperLUSolver<TAlgebra> > T;
+		typedef SuperLUSolver<TAlgebra> TBase;
+		string name = string("SuperLU_c").append(suffix);
+		reg.add_class_<T,TBase>(name, grp, "SuperLU solver respecting constraints")
+		.template add_constructor<void (*)(SmartPtr<IDomainDiscretization<TAlgebra> >)>("domain discretization")
+			.add_method("set_time", &T::set_time, "", "time")
+			.set_construct_as_smart_pointer(true);
+		reg.add_class_to_group(name, "SuperLU_c", tag);
+	}
+}
+
+
 }; // end Functionality
 
 // end group precond_bridge
@@ -109,6 +131,7 @@ void RegisterBridge_SuperLU(Registry& reg, string grp)
 
 	try{
 		RegisterAlgebraDependent<Functionality>(reg,grp);
+		RegisterDomainAlgebraDependent<Functionality>(reg,grp);
 	}
 	UG_REGISTRY_CATCH_THROW(grp);
 }

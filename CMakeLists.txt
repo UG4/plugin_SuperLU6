@@ -58,7 +58,7 @@ include(${UG_ROOT_CMAKE_PATH}/ug_plugin_includes.cmake)
 
 # detect path for SuperLU-Library
 if(SUPERLU_PATH)
-    # the user can suply a SUPER_LU path for his own compiled SuperLU   
+    # the user can supply a SUPER_LU path for his own compiled SuperLU   
     set(INTERNAL_SUPERLU_PATH "${SUPERLU_PATH}")
     message(STATUS "Info: SuperLU is ON, using user provided path ${INTERNAL_SUPERLU_PATH}")
 else(SUPERLU_PATH)

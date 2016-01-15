@@ -85,7 +85,7 @@ public:
 		}
 	}
 
-	void get_options(superlu_options_t opt)
+	void get_options(superlu_options_t& opt)
 	{
 		//opt.PrintStat = config.bPrintStat ? YES : NO;
 		opt.Equil = config.equil ? YES : NO;
@@ -193,9 +193,7 @@ public:
 		dCreate_CompRow_Matrix(&SuperLU_A, N, N, nnz, &nzval[0], &colind[0], &rowptr[0], SLU_NR, SLU_D, SLU_GE);
 
 		//rhs = doubleMalloc(N);
-		rhs.resize(N);
-		for (size_t i = 0; i < N; ++i)
-			rhs[i] = 0;
+		rhs.resize(N, 0.0);
 		dCreate_Dense_Matrix(&SuperLU_B, N, 1, &rhs[0], N, SLU_DN, SLU_D, SLU_GE);
 
 		perm_r.resize(N+1);

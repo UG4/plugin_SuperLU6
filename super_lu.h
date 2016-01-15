@@ -63,6 +63,9 @@ class SuperLUSolver : public IExternalSolver<TAlgebra>
 	SuperLUConfiguration config;
 	IExternalSolverImplementation *impl;
 public:
+
+	using IExternalSolver<TAlgebra>::init;
+
 	SuperLUSolver()
 	{
 		config.bPrintStat = false;
