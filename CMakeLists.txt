@@ -66,10 +66,26 @@ else(SUPERLU_PATH)
     message(STATUS "Info: SuperLU is ON, using uginstall provided path ${INTERNAL_SUPERLU_PATH} (Specify your own path by -DSUPERLU_PATH=... if necessary.)")    
 endif(SUPERLU_PATH)
 
+
+# clear library variable to make sure it is updated if necessary
+SET(SLU_LIB SLU_LIB-NOTFOUND)
+
+# we only support version 4.3
+#find_library(SLU_LIB NAMES superlu_4.3 superlu_4.2 superlu_4.1 superlu_4.0 superlu_5.1.1 superlu_5.1 
+
+find_library(SLU_LIB NAMES superlu_4.3
+			 PATHS ${INTERNAL_SUPERLU_PATH} PATH_SUFFIXES lib
+			 NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
+
+if ("${SLU_LIB}" STREQUAL "SLU_LIB-NOTFOUND")
+	message(FATAL_ERROR "SuperLU library was not found in ${INTERNAL_SUPERLU_PATH}")
+endif()
+
+
 # Add to build process 
 if(buildEmbeddedPlugins)
 	ExportSources(${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES})
-    ExportDependencies("${INTERNAL_SUPERLU_PATH}/lib/libsuperlu_4.3.a")
+    ExportDependencies("${SLU_LIB}")
     if(EXISTS "${INTERNAL_SUPERLU_PATH}/lib/blas.a")
         ExportDependencies("${INTERNAL_SUPERLU_PATH}/lib/blas.a")
     endif(EXISTS "${INTERNAL_SUPERLU_PATH}/lib/blas.a")
@@ -78,5 +94,5 @@ else(buildEmbeddedPlugins)
     include_directories("${INTERNAL_SUPERLU_PATH}/SRC/")
 	add_library(SuperLU SHARED ${SOURCES})	
 	target_link_libraries(SuperLU ug4)
-	target_link_libraries(SuperLU "${INTERNAL_SUPERLU_PATH}/lib/libsuperlu_4.3.a")
+	target_link_libraries(SuperLU "${SLU_LIB}")
 endif(buildEmbeddedPlugins)
