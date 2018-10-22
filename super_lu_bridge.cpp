@@ -80,9 +80,10 @@ static void Algebra(Registry& reg, string grp)
 	// 	SuperLU Solver
 	{
 		typedef SuperLUSolver<TAlgebra> T;
-		typedef ILinearOperatorInverse<vector_type> TBase;
+		typedef IExternalSolver<TAlgebra> TBase1;
+		typedef ILinearOperatorInverse<vector_type> TBase2;
 		string name = string("SuperLU").append(suffix);
-		reg.add_class_<T,TBase>(name, grp, "SuperLU")
+		reg.add_class_<T,TBase1,TBase2>(name, grp, "SuperLU")
 			.add_constructor()
 			.add_method("print_stat", &T::print_stat)
 			.add_method("equil", &T::equil)
