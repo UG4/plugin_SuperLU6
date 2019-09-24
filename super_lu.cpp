@@ -191,7 +191,7 @@ public:
 		THROW_IF_NOT_EQUAL(numRows, numCols);
 		size_t N = numRows;
 		size_t nnz = nzval.size();
-		if(N > 40000 && nnz > 400000) { UG_LOG("SuperLU preprocess, N = " << N << ", nnz = " << nnz << "... "); }
+		//if(N > 40000 && nnz > 400000) { UG_LOG("SuperLU preprocess, N = " << N << ", nnz = " << nnz << "... "); }
 
 		dCreate_CompRow_Matrix(&SuperLU_A, N, N, nnz, &nzval[0], &colind[0], &rowptr[0], SLU_NR, SLU_D, SLU_GE);
 
@@ -218,7 +218,7 @@ public:
 			StatPrint(&stat);
 		*/
 		StatFree(&stat);
-		if(N > 40000 && nnz > 400000) { UG_LOG("done.\n"); }
+		//if(N > 40000 && nnz > 400000) { UG_LOG("done.\n"); }
 		m_bInited = true;
 		return true;
 	}
