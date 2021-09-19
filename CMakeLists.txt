@@ -50,7 +50,7 @@ set(SOURCES 	super_lu_bridge.cpp super_lu.cpp super_lu.h)
 
 
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.12)
 project(UG_PLUGIN_${pluginName})
 # include the definitions and dependencies for ug-plugins.
 include(${UG_ROOT_CMAKE_PATH}/ug_plugin_includes.cmake)
