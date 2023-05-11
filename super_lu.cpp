@@ -154,8 +154,14 @@ public:
 		relax = sp_ienv(2);
 
 		/* Compute the LU factorization of A. */
-		dgstrf(options, &AC, relax, panel_size, etree,
-				NULL, lwork, perm_c, perm_r, L, U, stat, info);
+#ifdef SUPERLU_6_EXPERIMENTAL
+	GlobalLU_t glu;
+	dgstrf(options, &AC, relax, panel_size, etree,
+			NULL, lwork, perm_c, perm_r, L, U, &glu, stat, info);
+#else 
+	dgstrf(options, &AC, relax, panel_size, etree,
+			NULL, lwork, perm_c, perm_r, L, U, stat, info);
+#endif
 
 	    Destroy_CompCol_Permuted(&AC);
 	    if (bAANeedsFree)
