@@ -46,7 +46,7 @@
 ################################################################################
 
 set(pluginName	SuperLU)
-set(SOURCES 	super_lu_bridge.cpp super_lu.cpp super_lu.h)
+set(SOURCES 	super_lu.h super_lu.cpp super_lu_bridge.h super_lu_bridge.cpp  )
 
 
 
@@ -55,33 +55,48 @@ project(UG_PLUGIN_${pluginName})
 # include the definitions and dependencies for ug-plugins.
 include(${UG_ROOT_CMAKE_PATH}/ug_plugin_includes.cmake)
 
+# Option 1: Try to find SuperLU using PkgConfig.
+find_package(PkgConfig)
+	if (PkgConfig_FOUND)
+		pkg_check_modules(SUPERLU superlu)
+		message(STATUS "SuperLU-Info: ${SUPERLU_PATH} ${SUPERLU_INCLUDE_DIRS} ${SUPERLU_VERSION}")
+endif (PkgConfig_FOUND)
 
-# detect path for SuperLU-Library
+
+# Option 2: Detect path for SuperLU-Library
 if(SUPERLU_PATH)
     # the user can supply a SUPER_LU path for his own compiled SuperLU   
     set(INTERNAL_SUPERLU_PATH "${SUPERLU_PATH}")
-    message(STATUS "Info: SuperLU is ON, using user provided path SUPERLU_PATH=${INTERNAL_SUPERLU_PATH}")
+    message(STATUS "SuperLU-Info: SuperLU is ON, using user provided path SUPERLU_PATH=${INTERNAL_SUPERLU_PATH}")
 else(SUPERLU_PATH)
     UGInstall("SuperLU" INTERNAL_SUPERLU_PATH)
-    message(STATUS "Info: SuperLU is ON, using uginstall provided path ${INTERNAL_SUPERLU_PATH} (Specify your own path by -DSUPERLU_PATH=... if necessary.)")    
+    message(STATUS "SuperLU-Info: SuperLU is ON, using uginstall provided path ${INTERNAL_SUPERLU_PATH} (Specify your own path by -DSUPERLU_PATH=... if necessary.)")    
 endif(SUPERLU_PATH)
 
 
-# clear library variable to make sure it is updated if necessary
+# Clear library variable to make sure it is updated if necessary
 SET(SLU_LIB SLU_LIB-NOTFOUND)
 
 # we only support version 4.3
 #find_library(SLU_LIB NAMES superlu_4.3 superlu_4.2 superlu_4.1 superlu_4.0 superlu_5.1.1 superlu_5.1 
-
-find_library(SLU_LIB NAMES superlu_4.3
+find_library(SLU_LIB NAMES superlu_4.3 superlu
 			 PATHS ${INTERNAL_SUPERLU_PATH} PATH_SUFFIXES lib
 			 NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
 
+# Check, if library was found.
 if ("${SLU_LIB}" STREQUAL "SLU_LIB-NOTFOUND")
 	message(FATAL_ERROR "SuperLU library was not found in ${INTERNAL_SUPERLU_PATH}")
 endif()
 
 
+
+# Set variable for include dirs.
+if(NOT DEFINED SUPERLU_INCLUDE_DIRS)
+ 	set(SUPERLU_INCLUDE_DIRS "${INTERNAL_SUPERLU_PATH}/SRC/")
+endif (NOT DEFINED SUPERLU_INCLUDE_DIRS)
+message(STATUS "SuperLU-Info: ${SUPERLU_INCLUDE_DIRS}")
+  
+  
 # Add to build process 
 if(buildEmbeddedPlugins)
 	ExportSources(${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES})
@@ -89,10 +104,23 @@ if(buildEmbeddedPlugins)
     if(EXISTS "${INTERNAL_SUPERLU_PATH}/lib/blas.a")
         ExportDependencies("${INTERNAL_SUPERLU_PATH}/lib/blas.a")
     endif(EXISTS "${INTERNAL_SUPERLU_PATH}/lib/blas.a")
-    ExportIncludes("${INTERNAL_SUPERLU_PATH}/SRC/")
+    ExportIncludes(${SUPERLU_INCLUDE_DIRS})
 else(buildEmbeddedPlugins)
-    include_directories("${INTERNAL_SUPERLU_PATH}/SRC/")
+    include_directories(${SUPERLU_INCLUDE_DIRS})
 	add_library(SuperLU SHARED ${SOURCES})	
 	target_link_libraries(SuperLU ug4)
 	target_link_libraries(SuperLU "${SLU_LIB}")
 endif(buildEmbeddedPlugins)
+
+
+################################################################################
+# Python binding
+################################################################################
+if(USE_PYBIND11)
+	SET(PYBIND_SOURCES 	superlu_pybind.cpp)
+	SET(myLibraries ug4 ${pluginName})
+	# First argument must match module name in PYBIND11_MODULE call
+	ug4pybind_add_module(pysuperlu ${PYBIND_SOURCES} ${myLibraries})
+	target_link_libraries (pysuperlu PRIVATE ${pluginName})
+endif(USE_PYBIND11)
+

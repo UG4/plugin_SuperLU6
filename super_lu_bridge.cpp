@@ -44,8 +44,9 @@
 // preconditioner
 #include "lib_algebra/lib_algebra.h"
 #include "lib_algebra/operator/interface/constrained_linear_iterator.h"
-#include "super_lu.h"
 #include "bridge/util_overloaded.h"
+#include "super_lu.h"
+
 using namespace std;
 
 namespace ug{
@@ -67,8 +68,8 @@ struct Functionality
  * @param reg				registry
  * @param parentGroup		group for sorting of functionality
  */
-template <typename TAlgebra>
-static void Algebra(Registry& reg, string grp)
+template <typename TAlgebra, typename TRegistry=ug::bridge::Registry>
+static void Algebra(TRegistry& reg, string grp)
 {
 	string suffix = GetAlgebraSuffix<TAlgebra>();
 	string tag = GetAlgebraTag<TAlgebra>();
@@ -83,7 +84,7 @@ static void Algebra(Registry& reg, string grp)
 		typedef IExternalSolver<TAlgebra> TBase1;
 		typedef ILinearOperatorInverse<vector_type> TBase2;
 		string name = string("SuperLU").append(suffix);
-		reg.add_class_<T,TBase1,TBase2>(name, grp, "SuperLU")
+		reg.template add_class_<T,TBase1,TBase2>(name, grp, "SuperLU")
 			.add_constructor()
 			.add_method("print_stat", &T::print_stat)
 			.add_method("equil", &T::equil)
@@ -96,9 +97,8 @@ static void Algebra(Registry& reg, string grp)
 	}
 }
 
-
-template <typename TDomain, typename TAlgebra>
-static void DomainAlgebra(Registry& reg, string grp)
+template <typename TDomain, typename TAlgebra, typename TRegistry=ug::bridge::Registry>
+static void DomainAlgebra(TRegistry& reg, string grp)
 {
 	string suffix = GetDomainAlgebraSuffix<TDomain,TAlgebra>();
 	string tag = GetDomainAlgebraTag<TDomain,TAlgebra>();
@@ -108,8 +108,8 @@ static void DomainAlgebra(Registry& reg, string grp)
 		typedef ConstrainedLinearIterator<TDomain, TAlgebra, SuperLUSolver<TAlgebra> > T;
 		typedef SuperLUSolver<TAlgebra> TBase;
 		string name = string("SuperLU_c").append(suffix);
-		reg.add_class_<T,TBase>(name, grp, "SuperLU solver respecting constraints")
-		.template add_constructor<void (*)(SmartPtr<IDomainDiscretization<TAlgebra> >)>("domain discretization")
+		reg.template add_class_<T,TBase>(name, grp, "SuperLU solver respecting constraints")
+		   .template add_constructor<void (*)(SmartPtr<IDomainDiscretization<TAlgebra> >)>("domain discretization")
 			.add_method("set_time", &T::set_time, "", "time")
 			.set_construct_as_smart_pointer(true);
 		reg.add_class_to_group(name, "SuperLU_c", tag);
@@ -125,24 +125,42 @@ static void DomainAlgebra(Registry& reg, string grp)
 }// end Preconditioner
 
 /// \addtogroup precond_bridge
-void RegisterBridge_SuperLU(Registry& reg, string grp)
+template <typename TRegistry=ug::bridge::Registry>
+void RegisterBridge_SuperLU(TRegistry& reg, string grp)
 {
 	grp.append("/Algebra/ExternalSolvers/");
 	typedef SuperLUBridge::Functionality Functionality;
 
 	try{
+#ifndef UG_USE_PYBIND11
 		RegisterAlgebraDependent<Functionality>(reg,grp);
 		RegisterDomainAlgebraDependent<Functionality>(reg,grp);
+#else
+		RegisterAlgebraDependent<Functionality, TRegistry>(reg,grp);
+		RegisterDomainAlgebraDependent<Functionality, TRegistry>(reg,grp);
+#endif
 	}
 	UG_REGISTRY_CATCH_THROW(grp);
 }
 
 
+// The following functions are the exported
 extern "C" void
 InitUGPlugin_SuperLU(Registry* reg, string grp)
 {
 	RegisterBridge_SuperLU(*reg, grp);
 }
+
+
+#ifdef UG_USE_PYBIND11 // Expose for pybind11.
+namespace SuperLUBridge{
+	void InitUGPlugin(ug::pybind::Registry* reg, string grp)
+	{
+		RegisterBridge_SuperLU<ug::pybind::Registry>(*reg, grp);
+	}
+}
+#endif
+
 
 } // namespace bridge
 } // namespace ug
