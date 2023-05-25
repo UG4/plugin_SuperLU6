@@ -19,4 +19,4 @@ The default is the *internal* SuperLU v6.0.0, which is included as a submodule. 
 * If you are using SuperLU, remember to cite it! Bibtex information is [here](http://crd-legacy.lbl.gov/~xiaoye/SuperLU/referencing.html).
 
 ## License
-The plugin can be used in accordance with SuperLU license. Please
+The plugin can be used in accordance with SuperLU license. 
