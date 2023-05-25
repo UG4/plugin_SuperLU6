@@ -146,7 +146,7 @@ void RegisterBridge_SuperLU(TRegistry& reg, string grp)
 
 // The following functions are the exported
 extern "C" void
-InitUGPlugin_SuperLU(Registry* reg, string grp)
+InitUGPlugin_SuperLU6(Registry* reg, string grp)
 {
 	RegisterBridge_SuperLU(*reg, grp);
 }

@@ -2,7 +2,7 @@
 
 #include "bridge/util.h"
 
-extern "C" void InitUGPlugin_SuperLU(ug::bridge::Registry* reg, std::string grp);
+extern "C" void InitUGPlugin_SuperLU6(ug::bridge::Registry* reg, std::string grp);
 
 #ifdef UG_USE_PYBIND11
 
