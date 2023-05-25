@@ -38,7 +38,7 @@
 #define __H__UG__SUPER_LU_SOLVER__
 
 
-#undef SUPERLU_6_EXPERIMENTAL
+#define SUPERLU_6_EXPERIMENTAL 1
 
 #include "lib_algebra/operator/linear_solver/external_solvers/external_solvers.h"
 #include <vector>
