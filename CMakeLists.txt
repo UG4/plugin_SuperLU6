@@ -57,76 +57,92 @@ project(UG_PLUGIN_${pluginName})
 include(${UG_ROOT_CMAKE_PATH}/ug_plugin_includes.cmake)
 
 # Include SuperLU.
-
-# Option 0: Install SuperLU shipped with this version.
-# SET (BUILD_SHARED_LIBS OFF)
-SET (enable_tests OFF)
-SET (enable_single ON)
-SET (enable_single OFF)
-SET (enable_complex OFF)
-SET (enable_complex16 OFF)
-SET (enable_complex16 OFF)
-SET (SLU_LIB superlu)
-add_subdirectory(external/superlu)
-SET(INTERNAL_SUPERLU_PATH ${CMAKE_CURRENT_SOURCE_DIR}/external/superlu)
+option (USE_INTERNAL_SUPERLU "Use internal superlu shipped with this plugin" ON) 
+message(STATUS "SuperLU6-Info: using internal version ${USE_INTERNAL_SUPERLU}")
 
 
-# Option 1: Try to find SuperLU using PkgConfig.
-#find_package(PkgConfig)
-# if (PkgConfig_FOUND)
-#		pkg_check_modules(SUPERLU superlu)
-#		message(STATUS "SuperLU-Info: ${SUPERLU_PATH} ${SUPERLU_INCLUDE_DIRS} ${SUPERLU_VERSION}")
-#endif (PkgConfig_FOUND)
+# Clear internal variables
+SET(SLU_LIB SLU_LIB-NOTFOUND)
+
+if (USE_INTERNAL_SUPERLU)
+
+	# Option 0: Install SuperLU shipped with this version.
+	# SET (BUILD_SHARED_LIBS OFF)
+	SET (enable_tests OFF)
+	SET (enable_single ON)
+	SET (enable_single OFF)
+	SET (enable_complex OFF)
+	SET (enable_complex16 OFF)
+	SET (enable_complex16 OFF)
+	add_subdirectory(external/superlu)
+	
+	# Internal variables
+	SET (SLU_LIB superlu)
+	SET(INTERNAL_SUPERLU_PATH ${CMAKE_CURRENT_SOURCE_DIR}/external/superlu)
+	SET(SUPERLU_INCLUDE_DIRS "${INTERNAL_SUPERLU_PATH}/SRC/")
+
+else (USE_INTERNAL_SUPERLU)
 
 
-# Option 2: Detect path for SuperLU-Library
-#if(SUPERLU_PATH)
-#    # the user can supply a SUPER_LU path for his own compiled SuperLU   
-#    set(INTERNAL_SUPERLU_PATH "${SUPERLU_PATH}")
-#    message(STATUS "SuperLU-Info: SuperLU is ON, using user provided path SUPERLU_PATH=${INTERNAL_SUPERLU_PATH}")
-#else(SUPERLU_PATH)
-#    UGInstall("SuperLU" INTERNAL_SUPERLU_PATH)
-#    message(STATUS "SuperLU-Info: SuperLU is ON, using uginstall provided path ${INTERNAL_SUPERLU_PATH} (Specify your own path by #-#DSUPERLU_PATH=... if necessary.)")    
-#endif(SUPERLU_PATH)
+	# Option 1: Try to find SuperLU using PkgConfig.
+	find_package(PkgConfig)
+	if (PkgConfig_FOUND)
+			pkg_check_modules(SUPERLU superlu)
+			message(STATUS "SuperLU-Info: ${SUPERLU_PATH} ${SUPERLU_INCLUDE_DIRS} ${SUPERLU_VERSION}")
+	endif (PkgConfig_FOUND)
 
 
+	# Option 2: Detect path for SuperLU-Library
+	if(SUPERLU_PATH)
+	    # the user can supply a SUPER_LU path for his own compiled SuperLU   
+	    set(INTERNAL_SUPERLU_PATH "${SUPERLU_PATH}")
+	    message(STATUS "SuperLU-Info: SuperLU is ON, using user provided path SUPERLU_PATH=${INTERNAL_SUPERLU_PATH}")
+	endif(SUPERLU_PATH)
 
-# Clear library variable to make sure it is updated if necessary
-# SET(SLU_LIB SLU_LIB-NOTFOUND)
 
-# we only support version 4.3
-#find_library(SLU_LIB NAMES superlu_4.3 superlu_4.2 superlu_4.1 superlu_4.0 superlu_5.1.1 superlu_5.1 
-find_library(SLU_LIB NAMES superlu_4.3 superlu
+	
+
+	# we only support version 4.3
+	#find_library(SLU_LIB NAMES superlu_4.3 superlu_4.2 superlu_4.1 superlu_4.0 superlu_5.1.1 superlu_5.1 
+	find_library(SLU_LIB NAMES superlu_4.3 superlu
 			 PATHS ${INTERNAL_SUPERLU_PATH} PATH_SUFFIXES lib
 			 NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
 
-# Check, if library was found.
-#if ("${SLU_LIB}" STREQUAL "SLU_LIB-NOTFOUND")
-#	message(FATAL_ERROR "SuperLU library was not found in ${INTERNAL_SUPERLU_PATH}")
-#endif()
+
+
+endif (USE_INTERNAL_SUPERLU)
+
+
+
+# Check, if internal variables are set
+if ("${SLU_LIB}" STREQUAL "SLU_LIB-NOTFOUND")
+	message(FATAL_ERROR "SuperLU library was not found in ${INTERNAL_SUPERLU_PATH}")
+endif()
 
 
 
 
-# Set variable for include dirs.
-# if(NOT DEFINED SUPERLU_INCLUDE_DIRS)
-set(SUPERLU_INCLUDE_DIRS "${INTERNAL_SUPERLU_PATH}/SRC/")
-# endif (NOT DEFINED SUPERLU_INCLUDE_DIRS)
-message(STATUS "SuperLU6-Info: ${SUPERLU_INCLUDE_DIRS}") 
-message(STATUS "SuperLU6-Info: ${SUPERLU_VERSION}")  
-message(STATUS "SuperLU6-Info: ${SUPERLU_REV}")  
-message(STATUS "SuperLU6-Info: ${SLU_LIB}") 
+
+
+
+
+
+# Check variables.
+message(STATUS "SuperLU6-Info: version  ${SUPERLU_VERSION}")  
+message(STATUS "SuperLU6-Info: includes ${SUPERLU_INCLUDE_DIRS}") 
+message(STATUS "SuperLU6-Info: library  ${SLU_LIB}") 
+
 
 # Add to build process 
 if(buildEmbeddedPlugins)
 	ExportSources(${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES})
-    	ExportDependencies("${SLU_LIB}")
-    	#if(EXISTS "${INTERNAL_SUPERLU_PATH}/lib/blas.a")
-       # 	ExportDependencies("${INTERNAL_SUPERLU_PATH}/lib/blas.a")
-    	#endif(EXISTS "${INTERNAL_SUPERLU_PATH}/lib/blas.a")
-    	ExportIncludes(${SUPERLU_INCLUDE_DIRS})
+    ExportDependencies("${SLU_LIB}")
+    #if(EXISTS "${INTERNAL_SUPERLU_PATH}/lib/blas.a")
+    # 	ExportDependencies("${INTERNAL_SUPERLU_PATH}/lib/blas.a")
+    #endif(EXISTS "${INTERNAL_SUPERLU_PATH}/lib/blas.a")
+    ExportIncludes(${SUPERLU_INCLUDE_DIRS})
 else(buildEmbeddedPlugins)
-    	include_directories(${SUPERLU_INCLUDE_DIRS})
+    include_directories(${SUPERLU_INCLUDE_DIRS})
 	add_library(SuperLU6 SHARED ${SOURCES})	
 	target_link_libraries(SuperLU6 ug4)
 	target_link_libraries(SuperLU6 ${SLU_LIB})
