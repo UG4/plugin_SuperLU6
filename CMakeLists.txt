@@ -121,12 +121,6 @@ endif()
 
 
 
-
-
-
-
-
-
 # Check variables.
 message(STATUS "SuperLU6-Info: version  ${SUPERLU_VERSION}")  
 message(STATUS "SuperLU6-Info: includes ${SUPERLU_INCLUDE_DIRS}") 
@@ -154,9 +148,9 @@ endif(buildEmbeddedPlugins)
 ################################################################################
 if(USE_PYBIND11)
 	SET(PYBIND_SOURCES 	superlu_pybind.cpp)
-	SET(myLibraries ug4 ${pluginName})
+	SET(myLibraries ug4 SuperLU6)
 	# First argument must match module name in PYBIND11_MODULE call
 	ug4pybind_add_module(pysuperlu ${PYBIND_SOURCES} ${myLibraries})
-	target_link_libraries (pysuperlu PRIVATE ${pluginName})
+	target_link_libraries (pysuperlu PRIVATE SuperLU6)
 endif(USE_PYBIND11)
 
