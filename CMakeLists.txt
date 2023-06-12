@@ -140,6 +140,9 @@ else(buildEmbeddedPlugins)
 	add_library(SuperLU6 SHARED ${SOURCES})	
 	target_link_libraries(SuperLU6 ug4)
 	target_link_libraries(SuperLU6 ${SLU_LIB})
+	
+	# CPack specific
+	install(TARGETS SuperLU6 LIBRARY DESTINATION bin/plugins COMPONENT plugins)
 endif(buildEmbeddedPlugins)
 
 
@@ -152,5 +155,6 @@ if(USE_PYBIND11)
 	# First argument must match module name in PYBIND11_MODULE call
 	ug4pybind_add_module(pysuperlu ${PYBIND_SOURCES} ${myLibraries})
 	target_link_libraries (pysuperlu PRIVATE SuperLU6)
+	install(TARGETS pysuperlu LIBRARY DESTINATION bin/plugins/ug4 COMPONENT plugins)
 endif(USE_PYBIND11)
 
