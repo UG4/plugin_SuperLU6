@@ -142,7 +142,7 @@ else(buildEmbeddedPlugins)
 	target_link_libraries(SuperLU6 ${SLU_LIB})
 	
 	# CPack specific
-	set_target_properties(${pluginName} PROPERTIES INSTALL_RPATH "$ORIGIN/../../lib/")
+	set_target_properties(SuperLU6 PROPERTIES INSTALL_RPATH "$ORIGIN/../../lib/")
 	install(TARGETS SuperLU6 LIBRARY DESTINATION bin/plugins COMPONENT plugins)
 endif(buildEmbeddedPlugins)
 
