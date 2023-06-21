@@ -73,8 +73,10 @@ if (USE_INTERNAL_SUPERLU)
 	SET (enable_single OFF)
 	SET (enable_complex OFF)
 	SET (enable_complex16 OFF)
-	SET (enable_complex16 OFF)
 	add_subdirectory(external/superlu)
+	
+	# The static library has to be build with posititon independent code.
+	set_property(TARGET superlu PROPERTY POSITION_INDEPENDENT_CODE ON)
 	
 	# Internal variables
 	SET (SLU_LIB superlu)
