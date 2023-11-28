@@ -68,11 +68,15 @@ if (USE_INTERNAL_SUPERLU)
 
 	# Option 0: Install SuperLU shipped with this version.
 	# SET (BUILD_SHARED_LIBS OFF)
-	SET (enable_tests OFF)
-	SET (enable_single ON)
-	SET (enable_single OFF)
-	SET (enable_complex OFF)
-	SET (enable_complex16 OFF)
+
+	OPTION (enable_double ON)
+	OPTION (enable_single OFF)
+	OPTION (enable_complex OFF)
+	OPTION (enable_complex16 OFF)
+	
+	OPTION (enable_tests OFF)
+	OPTION (enable_doc OFF)
+	
 	add_subdirectory(external/superlu)
 	
 	# The static library has to be build with posititon independent code.
