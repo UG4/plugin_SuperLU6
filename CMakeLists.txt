@@ -69,13 +69,13 @@ if (USE_INTERNAL_SUPERLU)
 	# Option 0: Install SuperLU shipped with this version.
 	# SET (BUILD_SHARED_LIBS OFF)
 	SET(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
-	SET(enable_double ON)
-	SET(enable_single OFF)
-	SET(enable_complex OFF)
-	SET(enable_complex16 OFF)
+	SET(enable_double ON CACHE BOOL "Enable double")
+	SET(enable_single OFF CACHE BOOL "Disable single")
+	SET(enable_complex OFF CACHE BOOL "Disable complex")
+	SET(enable_complex16 OFF CACHE BOOL "Disable complex16")
 	
-	SET(enable_tests OFF)
-	SET(enable_doc OFF)
+	SET(enable_tests OFF CACHE BOOL "Disable tests")
+	SET(enable_doc OFF CACHE BOOL "Disable doc")
 	
 	add_subdirectory(external/superlu)
 	
