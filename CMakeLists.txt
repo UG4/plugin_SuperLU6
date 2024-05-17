@@ -133,6 +133,10 @@ message(STATUS "SuperLU6-Info: includes ${SUPERLU_INCLUDE_DIRS}")
 message(STATUS "SuperLU6-Info: library  ${SLU_LIB}") 
 
 
+################################################################################
+# Classic binding (static or dynamic plugin).
+################################################################################
+if(NOT USE_PYBIND11)
 # Add to build process 
 if(buildEmbeddedPlugins)
 	ExportSources(${CMAKE_CURRENT_SOURCE_DIR} ${SOURCES})
@@ -151,18 +155,25 @@ else(buildEmbeddedPlugins)
 	set_target_properties(SuperLU6 PROPERTIES INSTALL_RPATH "$ORIGIN/../../lib/")
 	install(TARGETS SuperLU6 LIBRARY DESTINATION bin/plugins COMPONENT plugins)
 endif(buildEmbeddedPlugins)
-
+endif(NOT USE_PYBIND11)
 
 ################################################################################
-# Python binding
+# Python binding (static plugin, dynamic python interface).
 ################################################################################
 if(USE_PYBIND11)
-	SET(PYBIND_SOURCES 	superlu_pybind.cpp)
+
+	# Static plugin.
+	include_directories(${SUPERLU_INCLUDE_DIRS})
+	add_library(SuperLU6 STATIC ${SOURCES})
+
+	SET(myPluginSources superlu_pybind.cpp)
 	SET(myLibraries ug4 SuperLU6)
+	
 	# First argument must match module name in PYBIND11_MODULE call
-	ug4pybind_add_module(pysuperlu ${PYBIND_SOURCES} ${myLibraries})
-	target_link_libraries (pysuperlu PRIVATE SuperLU6)
+	python_add_library(pysuperlu MODULE ${myPluginSources} ${SOURCES} WITH_SOABI)
+	# ug4pybind_add_module(pysuperlu ${myPluginSources} ${myLibraries})
+	target_link_libraries (pysuperlu PRIVATE SuperLU6 ug4_s)
 	set_target_properties(pysuperlu PROPERTIES INSTALL_RPATH "$ORIGIN/..:$ORIGIN/../../../lib")
-	install(TARGETS pysuperlu LIBRARY DESTINATION bin/plugins/ug4 COMPONENT plugins)
+	install(TARGETS pysuperlu LIBRARY DESTINATION ug4py COMPONENT pymodules)
 endif(USE_PYBIND11)
 
