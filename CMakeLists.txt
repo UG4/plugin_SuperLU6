@@ -50,7 +50,7 @@
 set(pluginName	SuperLU)
 set(SOURCES 	super_lu.h super_lu.cpp super_lu_bridge.h super_lu_bridge.cpp  )
 
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 2.8.12...3.20)
 project(UG_PLUGIN_${pluginName})
 
 # Include the definitions and dependencies for ug-plugins.
@@ -74,8 +74,9 @@ if (USE_INTERNAL_SUPERLU)
 	SET(enable_complex OFF CACHE BOOL "Disable complex")
 	SET(enable_complex16 OFF CACHE BOOL "Disable complex16")
 	
-	SET(enable_tests OFF CACHE BOOL "Disable tests")
-	SET(enable_doc OFF CACHE BOOL "Disable doc")
+	SET(enable_tests OFF CACHE BOOL "Disable tests" FORCE)
+	SET(enable_examples OFF CACHE BOOL "Disable examples" FORCE)
+	SET(enable_doc OFF CACHE BOOL "Disable doc" FORCE)
 	
 	add_subdirectory(external/superlu)
 	
