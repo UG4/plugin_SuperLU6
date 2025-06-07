@@ -15,27 +15,21 @@ jobs:
         os: [ubuntu-latest]
 
     steps:
-
       - name: Checkout self
         uses: actions/checkout@v4
         with:
           submodules: true
 
-      - name: Move sources to 'ug4-git/plugins/TiffImage'.
+      - name: Move sources to 'ug4-git/plugins/SuperLU6'.
         run: |
           mkdir ug4-git
           mkdir ug4-git/plugins
-          mkdir ug4-git/plugins/TiffImage
-          mv CMakeLists.txt ug4-git/plugins/TiffImage
-          mv libtiff ug4-git/plugins/TiffImage
-          mv src ug4-git/plugins/TiffImage
+          mkdir ug4-git/plugins/SuperLU6
+          mv * ug4-git/plugins/SuperLU6
 
       - name: Checkout ughub
         run: |
           git clone https://github.com/UG4/ughub.git
-
-      #- name: Install libtiff
-      #  run:  sudo apt-get install libtiff-dev libtiff6
 
       - name: Install UG4 packages into 'ug4-git/*' 
         run: |
@@ -46,7 +40,6 @@ jobs:
           python3 ../ughub/ughub.py git submodule init
           python3 ../ughub/ughub.py git submodule update
           
-
       - name: Switch to Pybind feature branch(es), if any.
         run: |
           pwd
@@ -85,11 +78,9 @@ jobs:
     needs:
     - build-wheels
     runs-on: ubuntu-latest
-    # Specifying a GitHub environment is optional, but strongly encouraged
-    environment: release
+    environment: release  # Specifying a GitHub environment is optional, but strongly encouraged
     permissions:
-      # IMPORTANT: this permission is mandatory for trusted publishing
-      id-token: write
+      id-token: write # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
       # retrieve your distributions here
       - name: Download all wheels
