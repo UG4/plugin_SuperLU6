@@ -47,6 +47,7 @@
 
 
 
+message(STATUS "# SuperLU6 - BEGIN ##############################################################################")
 set(pluginName	SuperLU)
 set(SOURCES 	super_lu.h super_lu.cpp super_lu_bridge.h super_lu_bridge.cpp  )
 
@@ -163,18 +164,37 @@ endif(NOT USE_PYBIND11)
 ################################################################################
 if(USE_PYBIND11)
 
-	# Static plugin.
 	include_directories(${SUPERLU_INCLUDE_DIRS})
+	
+	###############################################
+	# 0) Let's try to locate ug_4 static library....
+	###############################################
+	
+	set(UG4_STATIC_LIBRARY ug4_s)
+	if (BUILD_WITH_PIP)
+		get_libug4_from_pip(PYUG4_STATIC_LIBRARY)
+		message(STATUS "Library found: ${PYUG4_STATIC_LIBRARY}")
+		set(UG4_STATIC_LIBRARY ${PYUG4_STATIC_LIBRARY})
+	endif()
+	message(STATUS "Using libug4_s: ${UG4_STATIC_LIBRARY}")
+	
+
+	###############################################
+	# 1) Create (static) library for plugin.
+	###############################################
 	add_library(SuperLU6 STATIC ${SOURCES})
 
+	###############################################
+ 	# 2) Create (dynamic) python library module.
+ 	# First argumentin 'python_add_library' must match module name in PYBIND11_MODULE call!
+	###############################################
 	SET(myPluginSources superlu_pybind.cpp)
 	SET(myLibraries ug4 SuperLU6)
-	
-	# First argument must match module name in PYBIND11_MODULE call
 	python_add_library(pysuperlu MODULE ${myPluginSources} ${SOURCES} WITH_SOABI)
-	# ug4pybind_add_module(pysuperlu ${myPluginSources} ${myLibraries})
-	target_link_libraries (pysuperlu PRIVATE SuperLU6 ug4_s)
+	target_link_libraries (pysuperlu PRIVATE SuperLU6 ${UG4_STATIC_LIBRARY})
 	set_target_properties(pysuperlu PROPERTIES INSTALL_RPATH "$ORIGIN/..:$ORIGIN/../../../lib")
 	install(TARGETS pysuperlu LIBRARY DESTINATION ug4py COMPONENT pymodules)
 endif(USE_PYBIND11)
 
+message(STATUS "# SuperLU6 - END ##############################################################################
+")
