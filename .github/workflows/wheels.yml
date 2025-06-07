@@ -25,8 +25,9 @@ jobs:
           mkdir ug4-git
           mkdir ug4-git/plugins
           mkdir ug4-git/plugins/SuperLU6
-          mv * ug4-git/plugins/SuperLU6
-          mv ug4-git/plugins/SuperLU6/pyproject.toml .
+          mv external ug4-git/plugins/SuperLU6
+          mv *.cpp ug4-git/plugins/SuperLU6
+          mv *.h ug4-git/plugins/SuperLU6
         continue-on-error: true
 
       - name: Checkout ughub
