@@ -26,6 +26,7 @@ jobs:
           mkdir ug4-git/plugins
           mkdir ug4-git/plugins/SuperLU6
           mv external ug4-git/plugins/SuperLU6
+          mv CMakeLists.txt ug4-git/plugins/SuperLU6
           mv *.cpp ug4-git/plugins/SuperLU6
           mv *.h ug4-git/plugins/SuperLU6
         continue-on-error: true
