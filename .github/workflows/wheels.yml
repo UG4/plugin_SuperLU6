@@ -61,7 +61,8 @@ jobs:
           CIBW_BEFORE_ALL_LINUX: > 
             pwd && ls && 
             export UG4_ROOT=$PWD/ug4-git
-          # CIBW_ENVIRONMENT: "CMAKE_ARGS=-DUG_ROOT_CMAKE_PATH=${{ env.PWD }}/ugcore/cmake"
+          CIBW_BEFORE_ALL_MACOS: > 
+            pwd && ls && which python && env
           CMAKE_ARGS: >-
             ${{ contains(matrix.os, 'ubuntu') && '-DUG_ROOT_CMAKE_PATH=/project/ug4-git/ugcore/cmake' || 
              contains(matrix.os, 'windows') && '-DUG_ROOT_CMAKE_PATH=C:/a/plugin_SuperLU6/plugin_SuperLU6/ug4-git/ugcore/cmake' || 
