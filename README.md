@@ -15,7 +15,11 @@ The default is the *internal* SuperLU v6.0.0, which is included as a submodule. 
 
 
 ## Dependency
-* [SuperLU solver (v6.0.0)](https://github.com/xiaoyeli/superlu) is included as a submodule.
+* [SuperLU solver (v6.0.0)](https://github.com/xiaoyeli/superlu) is included as a submodule. It can be initiated  and updated via git:
+```
+  git submodule init 
+  git submodule update
+ ```
 * If you are using SuperLU, remember to cite it! Bibtex information is [here](http://crd-legacy.lbl.gov/~xiaoye/SuperLU/referencing.html).
 
 ## License
