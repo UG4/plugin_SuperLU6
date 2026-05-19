@@ -10,8 +10,8 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "ug4py-plugins-superlu"
-version = "0.0.1"
-description = "This is UG4-plugin for ijkdata."
+version = "0.1.0"
+description = "This is UG4-plugin for SuperLU6."
 readme = {file = "README.md", content-type = "text/markdown"}
 
 
