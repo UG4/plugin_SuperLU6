@@ -191,14 +191,6 @@ if(USE_PYBIND11)
 	###############################################
 	add_library(SuperLU6 STATIC ${SOURCES})
 
-	###############################################
- 	# 2) Create (dynamic) python library module.
- 	# First argumentin 'python_add_library' must match module name in PYBIND11_MODULE call!
-	###############################################
-	SET(myPluginSources superlu_pybind.cpp)
-	SET(myLibraries ug4 SuperLU6)
-	python_add_library(pysuperlu MODULE ${myPluginSources} ${SOURCES} WITH_SOABI)
-	target_link_libraries (pysuperlu PRIVATE SuperLU6 ${UG4_LIBRARY})
 
 	# IMPORTANT: ensures install RPATH is used during build
 	set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
@@ -208,6 +200,15 @@ if(USE_PYBIND11)
 	set(CMAKE_BUILD_RPATH_USE_ORIGIN TRUE)
 	set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
 
+	
+	###############################################
+ 	# 2) Create (dynamic) python library module.
+ 	# First argumentin 'python_add_library' must match module name in PYBIND11_MODULE call!
+	###############################################
+	SET(myPluginSources superlu_pybind.cpp)
+	SET(myLibraries ug4 SuperLU6)
+	python_add_library(pysuperlu MODULE ${myPluginSources} ${SOURCES} WITH_SOABI)
+	target_link_libraries (pysuperlu PRIVATE SuperLU6 ${UG4_LIBRARY})
 	
 	# Link ug4 dynamically.
 	if(APPLE)
