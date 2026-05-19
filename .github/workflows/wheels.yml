@@ -56,7 +56,8 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.4.0
         env:
-          CIBW_BUILD_VERBOSITY:  1
+          CIBW_BUILD_VERBOSITY:  3
+          CIBW_DEBUG_KEEP_CONTAINER: "true"
           CIBW_BUILD: cp312-*
           CIBW_SKIP: "*-win32 *-musllinux_* *linux_i686 *linux_s390x *linux_aarch64 *linux_s390x" 
           CIBW_BEFORE_ALL_LINUX: > 
