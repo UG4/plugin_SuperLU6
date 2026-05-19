@@ -179,7 +179,7 @@ if(USE_PYBIND11)
 	endif(buildDynamicLib)
 	
 	if (BUILD_WITH_PIP)
-		get_libug4_from_pip(PYUG4_STATIC_LIBRARY)
+		get_libug4_from_pip(PYUG4_STATIC_LIBRARY ${UG4_LIBRARY})
 		message(STATUS "Library found: ${PYUG4_STATIC_LIBRARY}")
 		set(UG4_LIBRARY ${PYUG4_STATIC_LIBRARY})
 	endif()
