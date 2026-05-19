@@ -199,14 +199,24 @@ if(USE_PYBIND11)
 	SET(myLibraries ug4 SuperLU6)
 	python_add_library(pysuperlu MODULE ${myPluginSources} ${SOURCES} WITH_SOABI)
 	target_link_libraries (pysuperlu PRIVATE SuperLU6 ${UG4_LIBRARY})
+
+	# IMPORTANT: ensures install RPATH is used during build
+	set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+
+	# avoid adding build directory paths into binaries
+	set(CMAKE_SKIP_BUILD_RPATH FALSE)
+	set(CMAKE_BUILD_RPATH_USE_ORIGIN TRUE)
+	set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+
 	
 	# Link ug4 dynamically.
 	if(APPLE)
     	set_target_properties(pysuperlu PROPERTIES 
-    		INSTALL_RPATH "@loader_path/../lib"
-    		BUILD_WITH_INSTALL_RPATH TRUE)
+    		INSTALL_RPATH "@loader_path/../lib")
 	elseif(LINUX AND NOT APPLE)
-		set_target_properties(pysuperlu PROPERTIES INSTALL_RPATH "$ORIGIN:$ORIGIN/../lib" BUILD_WITH_INSTALL_RPATH TRUE)
+		set_target_properties(pysuperlu PROPERTIES 
+			INSTALL_RPATH "$ORIGIN:$ORIGIN/../lib"
+			)
 	endif()
 
 	install(TARGETS pysuperlu LIBRARY DESTINATION ug4py COMPONENT pymodules)
