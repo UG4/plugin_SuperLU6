@@ -206,7 +206,7 @@ if(USE_PYBIND11)
     		INSTALL_RPATH "@loader_path/../lib"
     		BUILD_WITH_INSTALL_RPATH TRUE)
 	elseif(LINUX AND NOT APPLE)
-		set_target_properties(pysuperlu PROPERTIES INSTALL_RPATH "$ORIGIN:$ORIGIN/../lib")
+		set_target_properties(pysuperlu PROPERTIES INSTALL_RPATH "$ORIGIN:$ORIGIN/../lib" BUILD_WITH_INSTALL_RPATH TRUE)
 	endif()
 
 	install(TARGETS pysuperlu LIBRARY DESTINATION ug4py COMPONENT pymodules)
