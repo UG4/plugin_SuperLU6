@@ -14,7 +14,9 @@ jobs:
       matrix:
         # os: [windows-latest] # tested: ubuntu-latest, macos-latest, macos-13 # open: windows-latest
         # os: [ubuntu-latest, macos-latest, macos-13]
-        os: [ubuntu-latest]
+        # os: [ubuntu-latest] # compilation works
+        os: [macos-latest]
+        
     steps:
       - name: Checkout self
         uses: actions/checkout@v4
