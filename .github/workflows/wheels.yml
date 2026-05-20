@@ -69,6 +69,7 @@ jobs:
             ${{ contains(matrix.os, 'ubuntu') && '-DUG_ROOT_CMAKE_PATH=/project/ug4-git/ugcore/cmake' || 
              contains(matrix.os, 'windows') && '-DUG_ROOT_CMAKE_PATH=C:/a/plugin_SuperLU6/plugin_SuperLU6/ug4-git/ugcore/cmake' || 
              contains(matrix.os, 'macos') && '-DUG_ROOT_CMAKE_PATH=/Users/runner/work/plugin_SuperLU6/plugin_SuperLU6/ug4-git/ugcore/cmake' }}
+          CIBW_REPAIR_WHEEL_COMMAND_LINUX: "auditwheel repair --exclude libcore.so -w {dest_dir} {wheel}"
           
         with:
           package-dir: .
