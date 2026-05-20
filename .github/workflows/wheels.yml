@@ -15,7 +15,7 @@ jobs:
         # os: [windows-latest] # tested: ubuntu-latest, macos-latest, macos-13 # open: windows-latest
         # os: [ubuntu-latest, macos-latest, macos-13]
         # os: [ubuntu-latest] # compilation works
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         
     steps:
       - name: Checkout self
