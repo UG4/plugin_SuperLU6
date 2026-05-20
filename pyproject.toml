@@ -4,7 +4,7 @@ requires = [
     "cmake>=3.18",
     "ninja",
     "pybind11",
-    "ug4py-base>=0.4.0" # 0.4 offers dylibs
+     "ug4py-base>=0.4.0" # contains libug4.so, libCompile.so
 ]
 build-backend = "scikit_build_core.build"
 
@@ -13,7 +13,9 @@ name = "ug4py-plugins-superlu"
 version = "0.1.0"
 description = "This is UG4-plugin for SuperLU6."
 readme = {file = "README.md", content-type = "text/markdown"}
-
+dependencies = [
+    "ug4py-base>=0.4.0" # 0.4 offers dylibs
+]
 
 
 [tool.scikit-build]
