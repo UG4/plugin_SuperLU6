@@ -51,7 +51,7 @@ message(STATUS "# SuperLU6 - BEGIN #############################################
 set(pluginName	SuperLU)
 set(SOURCES 	super_lu.h super_lu.cpp super_lu_bridge.h super_lu_bridge.cpp  )
 
-cmake_minimum_required(VERSION 2.8.12...3.20)
+cmake_minimum_required(VERSION 2.8.12...4.4)
 project(UG_PLUGIN_${pluginName})
 
 # Include the definitions and dependencies for ug-plugins.
